@@ -413,6 +413,17 @@ function updateRules(parameterRedirectServices, customInstances) {
     getRandomInstance(stackoverflowInstances);
 
   function createRedirectRule(id, filter, instance) {
+    try {
+      uri = new URL(instance)
+      protocol = uri.protocol.slice(0, -1) //uri.protocol returns a trailing colon; slice that off
+      instance = uri.hostname
+      port = uri.port
+    } catch {
+      protocol = "https"
+      port = null
+    }
+    var transform = { scheme: protocol, host: instance, port: port }
+
     return {
       id: id,
       priority: 1,
@@ -424,7 +435,7 @@ function updateRules(parameterRedirectServices, customInstances) {
       action: {
         type: "redirect",
         redirect: {
-          transform: { scheme: "https", host: instance },
+          transform: transform,
         },
       },
     };
